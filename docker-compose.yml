@@ -1,0 +1,9 @@
+version: '2.1'
+services:
+
+  vertica:
+    image: dataplatform/docker-vertica
+    ports:
+      - 5433:5433
+    volumes:
+      - ./input/:/tmp/input
