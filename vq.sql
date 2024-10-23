@@ -1,6 +1,6 @@
-select * from projections;
+select * from projections where projection_schema != 'SBX';
 
-create external table athlete_external (
+create external table if not exists athlete_external (
     ID int,
     Name varchar(255),
     Sex varchar(1),
@@ -17,6 +17,7 @@ create external table athlete_external (
     Event varchar(255),
     Medal varchar(255)
 ) as copy from '/tmp/input/athlete.snappy.parquet' parquet;
+
 
 select * from athlete_external limit 100;
 
@@ -46,7 +47,7 @@ create table athlete2 (
     Event varchar(255),
     Medal varchar(255))
 order by Name
-segmented by (ID) all nodes;
+segmented by hash(ID) all nodes;
 
 insert into athlete2 select * from athlete1;
 
@@ -58,6 +59,7 @@ explain select * from athlete2 a1 join athlete2 a2 on a1.Games = a2.Games;
 
 create projection athlete2_games as select * from athlete2 order by Games;
 select start_refresh();
+select refresh('athlete2');
 
 drop table athlete_external;
 drop table athlete1;
